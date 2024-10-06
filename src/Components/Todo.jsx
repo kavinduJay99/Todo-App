@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { LuListTodo } from "react-icons/lu";
 import TodoItems from './TodoItems';
 
 
 const Todo = () => {
 
-    const [todoList,setTodoList] = useState([]);
+    const [todoList,setTodoList] = useState(localStorage.getItem("todos") ? JSON.parse(localStorage.getItem("todos")) : [ ]);
 
     const inputRef = useRef()
 
@@ -31,14 +31,29 @@ const Todo = () => {
         })
     }
 
+    const toggle = (id) =>{
+        setTodoList((prevTodos)=>{
+            return prevTodos.map((todo)=>{
+                if(todo.id === id){
+                    return {...todo, isComplete: !todo.isComplete};
+                }
+                return todo;
+            })
+        })
+    }
+
+useEffect(()=>{
+    localStorage.setItem("todos", JSON.stringify(todoList))
+},[todoList])
+
   return (
-    <div className='bg-white place-self-center	w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-xl'>
+    <div className='font-poppins bg-white place-self-center	w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-xl'>
        
         {/* ----- Title ----- */}
 
-        <div className='flex items-center mt-7 gap-2'>
-            <LuListTodo className='w-12 h-12'/>
-            <h1 className='text-3xl font-semibold '>To-Do List</h1>
+        <div className='flex items-center mt-7 gap-5'>
+            <LuListTodo className='w-9 h-9'/>
+            <h1 className='text-3xl font-semibold '>Todo List</h1>
         </div>
 
         {/* -----Input-Box ----- */}
@@ -51,7 +66,7 @@ const Todo = () => {
 
         <div>
             {todoList.map((item, index)=>{
-                return <TodoItems key={index} text={item.text} id={item.id} isComplete={item.isComplete} deleteTodo={deleteTodo}/>
+                return <TodoItems key={index} text={item.text} id={item.id} isComplete={item.isComplete} deleteTodo={deleteTodo} toggle={toggle}/>
             })}
             
         </div>
